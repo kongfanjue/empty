@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="一个现代、可访问、无依赖的登录页面示例（HTML/CSS/JS）。"
+    />
+    <title>登录</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page" aria-label="登录页面">
+      <section class="card" aria-labelledby="title">
+        <header class="card__header">
+          <div class="brand" aria-hidden="true">
+            <div class="brand__mark"></div>
+            <div class="brand__text">Acme</div>
+          </div>
+          <h1 id="title" class="title">欢迎回来</h1>
+          <p class="subtitle">请使用你的账号登录。</p>
+        </header>
+
+        <form id="login-form" class="form" novalidate>
+          <div class="field">
+            <label class="label" for="email">邮箱</label>
+            <div class="control">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                inputmode="email"
+                autocomplete="email"
+                placeholder="name@example.com"
+                required
+                aria-describedby="email-help email-error"
+              />
+            </div>
+            <div id="email-help" class="help">
+              请输入可接收验证码/通知的邮箱地址。
+            </div>
+            <div id="email-error" class="error" role="alert" aria-live="polite"></div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="password">密码</label>
+            <div class="control control--with-button">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="至少 8 位"
+                minlength="8"
+                required
+                aria-describedby="password-help password-error"
+              />
+              <button
+                id="toggle-password"
+                class="ghost-button"
+                type="button"
+                aria-label="显示密码"
+                aria-pressed="false"
+              >
+                显示
+              </button>
+            </div>
+            <div id="password-help" class="help">建议使用字母 + 数字 + 符号组合。</div>
+            <div
+              id="password-error"
+              class="error"
+              role="alert"
+              aria-live="polite"
+            ></div>
+          </div>
+
+          <div class="row">
+            <label class="checkbox">
+              <input id="remember" name="remember" type="checkbox" />
+              <span>记住我</span>
+            </label>
+
+            <a class="link" href="#" aria-label="忘记密码（示例链接）">忘记密码？</a>
+          </div>
+
+          <button id="submit" class="primary-button" type="submit">
+            <span class="primary-button__text">登录</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+
+          <div
+            id="form-message"
+            class="message"
+            role="status"
+            aria-live="polite"
+          ></div>
+
+          <footer class="card__footer">
+            <span>还没有账号？</span>
+            <a class="link" href="#" aria-label="注册（示例链接）">注册</a>
+          </footer>
+        </form>
+      </section>
+
+      <section class="side" aria-label="侧边介绍">
+        <div class="side__panel">
+          <h2 class="side__title">安全、快速、好用</h2>
+          <ul class="side__list">
+            <li>基础校验与错误提示</li>
+            <li>密码显示/隐藏</li>
+            <li>加载态与防重复提交</li>
+            <li>键盘/读屏友好</li>
+          </ul>
+          <p class="side__note">
+            这是前端示例页面：默认用“模拟请求”演示登录流程，你可以在
+            <code>app.js</code> 中接入真实 API。
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
