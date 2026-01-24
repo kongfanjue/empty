@@ -47,13 +47,13 @@ class GoldPricePredictor:
         获取黄金价格及相关因子数据
         
         因子说明：
-        - GLD: 黄金ETF（代表金价）
+        - GC=F: COMEX黄金期货（美元/盎司，真实金价）
         - DX-Y.NYB: 美元指数（负相关）
         - ^TNX: 10年期美债收益率（负相关）
         - ^VIX: 恐慌指数（正相关，避险情绪）
         - TIP: 通胀保值债券ETF（通胀预期）
-        - USO: 原油ETF（通胀关联）
-        - SLV: 白银ETF（贵金属联动）
+        - CL=F: WTI原油期货（通胀关联）
+        - SI=F: 白银期货（美元/盎司，贵金属联动）
         - SPY: 标普500 ETF（风险偏好）
         """
         print("=" * 60)
@@ -63,15 +63,15 @@ class GoldPricePredictor:
         end_date = datetime.now()
         start_date = end_date - timedelta(days=period_days + 60)  # 多取60天用于计算技术指标
         
-        # 定义要获取的标的
+        # 定义要获取的标的 - 使用期货价格获取真实金价（美元/盎司）
         tickers = {
-            'GLD': '黄金ETF (金价代理)',
+            'GC=F': '黄金期货 (美元/盎司)',
             'DX-Y.NYB': '美元指数',
             '^TNX': '10年期美债收益率',
             '^VIX': 'VIX恐慌指数',
             'TIP': '通胀保值债券ETF',
-            'USO': '原油ETF',
-            'SLV': '白银ETF',
+            'CL=F': 'WTI原油期货',
+            'SI=F': '白银期货 (美元/盎司)',
             'SPY': '标普500 ETF'
         }
         
@@ -97,13 +97,13 @@ class GoldPricePredictor:
         
         # 重命名列
         column_mapping = {
-            'GLD': 'gold_price',
+            'GC=F': 'gold_price',      # 黄金期货 美元/盎司
             'DX-Y.NYB': 'usd_index',
             '^TNX': 'us10y_yield',
             '^VIX': 'vix',
             'TIP': 'tip_inflation',
-            'USO': 'oil_price',
-            'SLV': 'silver_price',
+            'CL=F': 'oil_price',        # WTI原油期货
+            'SI=F': 'silver_price',     # 白银期货 美元/盎司
             'SPY': 'sp500'
         }
         combined = combined.rename(columns=column_mapping)
@@ -293,9 +293,9 @@ class GoldPricePredictor:
         }
         
         print(f"\n当前日期: {result['current_date']}")
-        print(f"当前金价 (GLD): ${current_price:.2f}")
+        print(f"当前金价: ${current_price:.2f} 美元/盎司")
         print(f"\n预测日期: {result['prediction_date']}")
-        print(f"预测金价 (GLD): ${prediction:.2f}")
+        print(f"预测金价: ${prediction:.2f} 美元/盎司")
         print(f"预测变化: {'+' if change >= 0 else ''}{change:.2f} ({'+' if change_pct >= 0 else ''}{change_pct:.2f}%)")
         
         # 给出方向建议
@@ -371,12 +371,12 @@ class GoldPricePredictor:
         
         # 1. 金价走势 + 移动平均线
         ax1 = axes[0, 0]
-        ax1.plot(df.index, df['gold_price'], label='GLD Price', color='gold', linewidth=2)
+        ax1.plot(df.index, df['gold_price'], label='Gold Price', color='gold', linewidth=2)
         ax1.plot(df.index, df['gold_ma20'], label='MA20', color='blue', linestyle='--', alpha=0.7)
         ax1.plot(df.index, df['gold_ma50'], label='MA50', color='red', linestyle='--', alpha=0.7)
-        ax1.set_title('Gold Price (GLD) with Moving Averages\n金价走势与移动平均线')
+        ax1.set_title('Gold Price (USD/oz) with Moving Averages\n金价走势与移动平均线 (美元/盎司)')
         ax1.set_xlabel('Date')
-        ax1.set_ylabel('Price ($)')
+        ax1.set_ylabel('Price ($/oz)')
         ax1.legend()
         ax1.grid(True, alpha=0.3)
         ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
@@ -386,11 +386,11 @@ class GoldPricePredictor:
         # 2. 金价 vs 美元指数
         ax2 = axes[0, 1]
         ax2_twin = ax2.twinx()
-        ax2.plot(df.index, df['gold_price'], label='Gold (GLD)', color='gold', linewidth=2)
+        ax2.plot(df.index, df['gold_price'], label='Gold (USD/oz)', color='gold', linewidth=2)
         ax2_twin.plot(df.index, df['usd_index'], label='USD Index', color='green', linewidth=2)
         ax2.set_title('Gold vs USD Index\n金价 vs 美元指数')
         ax2.set_xlabel('Date')
-        ax2.set_ylabel('Gold Price ($)', color='gold')
+        ax2.set_ylabel('Gold Price ($/oz)', color='gold')
         ax2_twin.set_ylabel('USD Index', color='green')
         ax2.legend(loc='upper left')
         ax2_twin.legend(loc='upper right')
@@ -496,16 +496,16 @@ class GoldPricePredictor:
 ║  报告生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}                           ║
 ╚══════════════════════════════════════════════════════════════════╝
 
-【一、价格概览】
+【一、价格概览】(单位: 美元/盎司)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  当前价格 (GLD): ${latest_price:.2f}
+  当前金价:      ${latest_price:.2f} /盎司
   过去1个月涨跌:  {'+' if return_1m >= 0 else ''}{return_1m:.2f}%
   过去3个月涨跌:  {'+' if return_3m >= 0 else ''}{return_3m:.2f}%
   过去1年涨跌:    {'+' if return_1y >= 0 else ''}{return_1y:.2f}%
   
-  一年最高价: ${max_price:.2f}
-  一年最低价: ${min_price:.2f}
-  一年平均价: ${avg_price:.2f}
+  一年最高价: ${max_price:.2f} /盎司
+  一年最低价: ${min_price:.2f} /盎司
+  一年平均价: ${avg_price:.2f} /盎司
 
 【二、技术指标】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -517,7 +517,7 @@ class GoldPricePredictor:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   预测模型:   {self.best_model_name}
   预测日期:   {prediction_result['prediction_date']}
-  预测价格:   ${prediction_result['predicted_price']:.2f}
+  预测价格:   ${prediction_result['predicted_price']:.2f} /盎司
   预测涨跌:   {'+' if prediction_result['change'] >= 0 else ''}{prediction_result['change']:.2f} ({'+' if prediction_result['change_pct'] >= 0 else ''}{prediction_result['change_pct']:.2f}%)
   
   趋势判断:   {'📈 看涨' if prediction_result['change_pct'] > 0.5 else '📉 看跌' if prediction_result['change_pct'] < -0.5 else '➡️ 震荡'}
@@ -527,7 +527,7 @@ class GoldPricePredictor:
   · 美元指数 (负相关):   当前 {latest_usd:.2f}
   · 美债收益率 (负相关): 当前 {df['us10y_yield'].iloc[-1]:.2f}%
   · VIX恐慌 (正相关):    当前 {latest_vix:.1f}
-  · 白银价格 (正相关):   当前 ${df['silver_price'].iloc[-1]:.2f}
+  · 白银价格 (正相关):   当前 ${df['silver_price'].iloc[-1]:.2f} /盎司
 
 【五、风险提示】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
